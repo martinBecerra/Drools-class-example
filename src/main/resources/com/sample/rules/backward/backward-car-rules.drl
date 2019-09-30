@@ -1,0 +1,58 @@
+//created on: 29/09/2019
+package BackwardCarRules
+
+//list any import classes here.
+
+import model.Motor;
+import model.Reparacion;
+import model.RecomendacionPreliminar;
+import model.Arranque;
+import model.Bateria;
+import model.TanqueCombustible;
+import model.FuerzaMotor;
+import model.ReparacionMotor;
+
+//declare any global variables here
+
+
+// Diagnostico preliminar
+
+query "Hipotesis: Automovil no necesita reparacion"
+	 exists Motor( arranque.isa(Arranque.Gira), fuerzaMotor.isa(FuerzaMotor.Normal), 
+     presentaExplosiones == false, presentaGolpes == false, observaFuncNormal == true)
+     exists Bateria( tieneCarga == true )
+     exists TanqueCombustible(tieneCombustible == true)
+end
+
+query "Hipotesis: Automovil no tiene combustible"
+	 exists Motor( arranque.isa(Arranque.Gira))
+     exists TanqueCombustible ( tieneCombustible == false )
+end
+
+query "Hipotesis: Bateria no tiene carga"
+	exists Bateria(tieneCarga == false)
+	exists Motor( arranque.isa(Arranque.NoGira) )
+end
+
+// Diagnostico motor
+
+query "Hipotesis: Tuberias del motor esan tapadas"
+	exists Motor(fuerzaMotor.isa(FuerzaMotor.Debil))
+end
+
+
+query "Hipotesis: Los puntos de injeccion estan desajustados"
+    //include attributes such as "salience" here...
+    exists Motor( presentaExplosiones == true)
+end
+
+
+query "Hipotesis: El timer del motor no esta a punto"
+	exists Motor( presentaGolpes == true)
+end
+
+query "Hipotesis: No encuentro el problema, debería consultar a otro experto"
+	exists Motor( fuerzaMotor.isa(FuerzaMotor.Normal), presentaGolpes == false, presentaExplosiones == false, 
+        observaFuncNormal == false )
+end  
+

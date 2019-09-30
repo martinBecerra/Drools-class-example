@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+     <kbase name="car-rules" packages="forward">
+        <ksession name="kforward-chaining-session"/>
+    </kbase>
+    
+     <kbase name="car-backward-rules" packages="backward">
+        <ksession name="kbackward-chaining-session"/>
+    </kbase>
+    
+    <kbase name="dtables" packages="com.sample.dtables">
+        <ksession name="ksession-dtables"/>
+    </kbase>
+    <kbase name="process" packages="com.sample.process">
+        <ksession name="ksession-process"/>
+    </kbase>
+</kmodule>

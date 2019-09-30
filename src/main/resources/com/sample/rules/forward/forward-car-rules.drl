@@ -1,0 +1,102 @@
+//created on: 29/09/2019
+package forwardCarRules
+
+//list any import classes here.
+import model.Motor;
+import model.Reparacion;
+import model.RecomendacionPreliminar;
+import model.Arranque;
+import model.Bateria;
+import model.TanqueCombustible;
+import model.FuerzaMotor;
+import model.ReparacionMotor;
+
+//declare any global variables here
+
+rule "No necesita reparaciones"
+
+    when
+        Motor( arranque.isa(Arranque.Gira), fuerzaMotor.isa(FuerzaMotor.Normal), 
+        presentaExplosiones == false, presentaGolpes == false, observaFuncNormal == true)
+        Bateria( tieneCarga == true )
+        TanqueCombustible(tieneCombustible == true)
+        $reparacion: Reparacion( )
+    then
+        $reparacion.setRecomendacionPreliminar(RecomendacionPreliminar.NoNecesita);
+
+end
+
+rule "Cargar bateria"
+    //include attributes such as "salience" here...
+    when
+   		Motor( arranque.isa(Arranque.NoGira) )
+        Bateria( tieneCarga == false )
+        $reparacion: Reparacion( )
+    then
+        $reparacion.setRecomendacionPreliminar(RecomendacionPreliminar.CargarBateria);
+
+end
+
+
+rule "Cargar combustible"
+    //include attributes such as "salience" here...
+    when
+        Motor( arranque.isa(Arranque.Gira))
+        TanqueCombustible ( tieneCombustible == false )
+        $reparacion: Reparacion( )
+    then
+        $reparacion.setRecomendacionPreliminar(RecomendacionPreliminar.CargarCombustible);
+
+end
+
+rule "Diagnostico preliminar completado sin detectar causas"
+    //include attributes such as "salience" here...
+    when
+         Motor( arranque.isa(Arranque.Gira), observaFuncNormal == false)
+         TanqueCombustible( tieneCombustible == true )
+         Bateria( tieneCarga == true )
+         $reparacion: Reparacion( )
+    then
+         $reparacion.setRecomendacionPreliminar(RecomendacionPreliminar.RevisarMotor);
+
+end
+
+rule "Limpiar tuberias de combustible"
+    //include attributes such as "salience" here...
+    when
+        Motor(fuerzaMotor.isa(FuerzaMotor.Debil))
+        $reparacion: Reparacion( )
+    then
+        $reparacion.setReparacionMotor(ReparacionMotor.LimpiarTuberiasCombustible);
+
+end
+
+rule "Ajustar puntos de inyeccion"
+    //include attributes such as "salience" here...
+  when
+        $reparacion: Reparacion( )
+        Motor( presentaExplosiones == true)
+    then
+        $reparacion.setReparacionMotor(ReparacionMotor.AjustarPuntosDeInyeccion);
+
+end
+
+rule "Ajustar timing de motor"
+    //include attributes such as "salience" here...
+   when
+        $reparacion: Reparacion()
+        Motor( presentaGolpes == true)
+    then
+        $reparacion.setReparacionMotor(ReparacionMotor.AjustarTimingMotor);
+end
+
+rule "Consulta experto"
+    //include attributes such as "salience" here...
+    when
+        $reparacion: Reparacion()
+        Motor(fuerzaMotor.isa(FuerzaMotor.Normal), presentaGolpes == false, presentaExplosiones == false, 
+        observaFuncNormal == false )
+    then
+        $reparacion.setReparacionMotor(ReparacionMotor.ConsultarExperto);
+
+end
